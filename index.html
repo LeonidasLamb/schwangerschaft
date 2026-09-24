@@ -904,7 +904,7 @@ const CHECKLIST = [
 const SOURCES_ALL = Object.entries(SRC);
 
 /* ============ STATE ============ */
-const LS_SET='preg_settings_v2', LS_CHK='preg_checks_v1', LS_COMP='preg_compliments_v1', LS_JOU='preg_journal_v1';
+const LS_SET='preg_settings_v2', LS_CHK='preg_checks_v1', LS_JOU='preg_journal_v1';
 
 /* Referenzlängen (Scheitel-Steiß bis SSW 20, danach Scheitel-Ferse) */
 const REF_LEN = {4:0.2,5:0.3,6:0.7,7:1.15,8:1.6,9:2.3,10:3.1,11:4.1,12:5.4,13:7.4,14:8.7,15:10.1,16:11.6,17:13,18:14.2,19:15.3,20:16.4,21:26.7,22:27.8,23:28.9,24:30,25:34.6,26:35.6,27:36.6,28:37.6,29:38.6,30:39.9,31:41.1,32:42.4,33:43.7,34:45,35:46.2,36:47.4,37:48.6,38:49.8,39:50.7,40:51.2};
@@ -913,7 +913,6 @@ function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
 let settings = Object.assign({dueDate:'2027-05-20', name:'', nextAppt:'', partnerLabel:'Von deinem Mann'}, lsGet(LS_SET,{}));
 let checks = lsGet(LS_CHK,{});
-let ownCompliments = lsGet(LS_COMP,[]);
 let journal = lsGet(LS_JOU,{});
 let journalMsg = '';
 let settingsMsg = '';
@@ -1048,7 +1047,7 @@ function todaysQuote(tri){
   return pool[dayIndex() % pool.length];
 }
 function allCompliments(){
-  return COMPLIMENTS.concat(ownCompliments).filter(s=>s && s.trim());
+  return COMPLIMENTS.filter(s=>s && s.trim());
 }
 function todaysCompliment(){
   const list = allCompliments();
@@ -1205,13 +1204,6 @@ function renderSettings(){
     <div class="settings-row">
       <div class="sfield"><label>Nächster Vorsorgetermin</label><input type="date" value="${settings.nextAppt}" onchange="updateSetting('nextAppt',this.value)"></div>
       <div class="sfield"><label>Absender der Komplimente</label><input type="text" value="${esc(settings.partnerLabel||'')}" onchange="updateSetting('partnerLabel',this.value)"></div>
-    </div>
-    <div class="settings-div"></div>
-    <div class="sfield">
-      <label>Komplimente – ein Satz pro Zeile</label>
-      <textarea id="compBox" rows="5" placeholder="Du bleibst ruhig, wenn alle anderen längst durchdrehen.&#10;Dein Lachen macht jeden Raum leichter.">${esc(ownCompliments.join('\n'))}</textarea>
-      <button class="save-btn" onclick="saveCompliments()">Komplimente speichern</button>
-      <div class="settings-note">Jeden Tag erscheint automatisch ein anderer Satz daraus auf der Startseite. Gespeichert wird nur in diesem Browser – damit sie auf jedem Gerät ankommen, können sie auch fest eingebaut werden.</div>
     </div>
     <div class="settings-div"></div>
     <div class="sfield">
@@ -1540,7 +1532,7 @@ function toggleSettings(){ settingsOpen=!settingsOpen; render(); }
 function updateSetting(k,v){ settings[k]=v; lsSet(LS_SET,settings); render(); }
 function toggleCheck(id){ checks[id]=!checks[id]; lsSet(LS_CHK,checks); render(); }
 /* ---- Sicherung ---- */
-const LS_KEYS=[LS_SET,LS_CHK,LS_COMP,LS_JOU];
+const LS_KEYS=[LS_SET,LS_CHK,LS_JOU];
 function exportData(){
   try{
     const data={};
@@ -1565,7 +1557,7 @@ function importData(input){
       let n=0;
       Object.keys(d).forEach(k=>{ if(k.indexOf('preg_')===0){ localStorage.setItem(k,d[k]); n++; } });
       settings=Object.assign({dueDate:'2027-05-20',name:'',nextAppt:'',partnerLabel:'Von deinem Mann'},lsGet(LS_SET,{}));
-      checks=lsGet(LS_CHK,{}); ownCompliments=lsGet(LS_COMP,[]); journal=lsGet(LS_JOU,{});
+      checks=lsGet(LS_CHK,{}); journal=lsGet(LS_JOU,{});
       settingsMsg=n?'Sicherung eingelesen – alles wiederhergestellt.':'Datei enthielt keine Daten.';
     }catch(e){ settingsMsg='Datei konnte nicht gelesen werden.'; }
     render();
@@ -1573,13 +1565,6 @@ function importData(input){
   r.readAsText(f);
 }
 
-function saveCompliments(){
-  const box = document.getElementById('compBox');
-  if(!box) return;
-  ownCompliments = box.value.split('\n').map(s=>s.trim()).filter(Boolean);
-  lsSet(LS_COMP,ownCompliments);
-  render();
-}
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && activeSheet) closeSheet(); });
 
 /* Das Dokument wird in eine fremde Seite eingebettet – dadurch landen die
