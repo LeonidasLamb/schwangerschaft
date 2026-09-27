@@ -198,6 +198,33 @@ a{color:inherit}
 .focus-text{font-family:-apple-system,sans-serif;font-size:11.5px;color:var(--ink4);line-height:1.45;margin-top:2px}
 .focus-chev{color:var(--ink4);flex-shrink:0;font-size:15px}
 
+/* ---- Tagesroutine ---- */
+.rhead{display:flex;align-items:baseline;justify-content:space-between;margin:1.5rem 0 .5rem .2rem}
+.rcount{font-size:11px;color:var(--ink4);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.rcount.done{color:var(--gold-text);font-weight:600}
+.rcard{background:var(--c1);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:1.3rem;transition:border-color .3s ease}
+.rcard.complete{border-color:var(--gold-l);background:linear-gradient(135deg,var(--c1),var(--c2))}
+.rrow{display:flex;align-items:center;border-top:1px solid var(--line)}
+.rrow:first-child{border-top:none}
+.rrow-main{flex:1;display:flex;align-items:center;gap:.8rem;padding:.8rem 1rem;cursor:pointer;min-height:56px}
+.rrow-body{min-width:0}
+.rrow-label{font-size:14.5px;color:var(--ink);line-height:1.3}
+.rrow-hint{font-size:10.5px;color:var(--ink4);margin-top:1px;letter-spacing:.02em}
+.rrow.on .rrow-label{color:var(--ink4);text-decoration:line-through}
+.rrow.on .rrow-hint{opacity:.6}
+.rrow-del{background:none;border:none;color:var(--line2);font-size:20px;line-height:1;cursor:pointer;padding:.5rem .9rem .6rem;font-family:-apple-system,sans-serif}
+.rrow-del:hover{color:var(--warn)}
+.radd-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.4rem;background:none;border:none;
+  border-top:1px solid var(--line);color:var(--gold-text);font-size:11.5px;font-weight:600;padding:.85rem;cursor:pointer;min-height:48px}
+.radd-btn:hover{background:var(--c2)}
+.radd{padding:.7rem .8rem;gap:.5rem}
+.radd-input{flex:1;border:1px solid var(--line2);border-radius:10px;padding:.6rem .7rem;font-size:16px;
+  font-family:Georgia,serif;color:var(--ink);background:var(--c0);outline:none;min-width:0}
+.radd-input:focus{border-color:var(--gold)}
+.radd-ok{background:var(--gold);color:#fff;border:none;border-radius:10px;padding:.6rem .9rem;font-family:-apple-system,sans-serif;
+  font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:40px}
+.radd-ok:hover{background:var(--gold-d);color:var(--c0)}
+
 /* ---- Listenzeilen (Wissen) ---- */
 .lgroup{margin-bottom:1.5rem}
 .lgroup-label{font-family:-apple-system,sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
@@ -960,6 +987,44 @@ const CHECKLIST = [
 
 const SOURCES_ALL = Object.entries(SRC);
 
+/* Tagesroutine – erscheint je nach Schwangerschaftswoche, Haken gelten nur für heute */
+const ROUTINE = [
+  {id:'folat', label:'Folsäure',        hint:'400 µg – bis Ende SSW 12', art:'leaf',     from:4,  to:12},
+  {id:'jod',   label:'Jod',             hint:'100–150 µg',               art:'droplet',  from:4,  to:40},
+  {id:'vitd',  label:'Vitamin D',       hint:'20 µg, wenn wenig Sonne',  art:'sun',      from:4,  to:40},
+  {id:'water', label:'Genug getrunken', hint:'etwa 2 bis 2,5 Liter',     art:'milkglass',from:4,  to:40},
+  {id:'move',  label:'Bewegt',          hint:'ein Spaziergang zählt',    art:'walk',     from:4,  to:40},
+  {id:'pelvic',label:'Beckenboden',     hint:'3× pro Woche genügt',      art:'blossom',  from:13, to:40},
+  {id:'kicks', label:'Kindsbewegungen', hint:'ab jetzt täglich spüren',  art:'footprint',from:28, to:40},
+  {id:'rest',  label:'Pause gemacht',   hint:'ohne schlechtes Gewissen', art:'moon',     from:4,  to:40},
+];
+function routineToday(w){
+  const own=(lsGet(LS_ROWN,[])||[]).map(o=>({id:o.id,label:o.label,hint:'eigene Aufgabe',art:'sparkle',own:true}));
+  return ROUTINE.filter(r=>w>=r.from && w<=r.to).concat(own);
+}
+function routineChecked(iso){ const all=lsGet(LS_ROUT,{}); return all[iso]||{}; }
+function toggleRoutine(id){
+  const iso=todayISO(), all=lsGet(LS_ROUT,{}), day=all[iso]||{};
+  if(day[id]) delete day[id]; else day[id]=1;
+  all[iso]=day;
+  // nur die letzten 30 Tage behalten
+  const keep=Object.keys(all).sort().slice(-30);
+  const trimmed={}; keep.forEach(k=>{ if(Object.keys(all[k]).length) trimmed[k]=all[k]; });
+  lsSet(LS_ROUT,trimmed); render();
+}
+function addRoutineItem(){
+  const box=document.getElementById('newRoutine');
+  if(!box) return;
+  const label=(box.value||'').trim();
+  if(!label){ routineAdding=false; render(); return; }
+  const own=lsGet(LS_ROWN,[])||[];
+  own.push({id:'own'+Date.now(), label:label.slice(0,60)});
+  lsSet(LS_ROWN,own); routineAdding=false; render();
+}
+function removeRoutineItem(id){
+  lsSet(LS_ROWN,(lsGet(LS_ROWN,[])||[]).filter(o=>o.id!==id)); render();
+}
+
 /* Was in der jeweiligen Woche wirklich ansteht – höchste Priorität zuerst */
 const WEEK_FOCUS = [
   {from:4,to:12,pri:1,art:'leaf',sheet:'supp',title:'Folsäure und Jod',text:'Die beiden Mittel, die jetzt für alle empfohlen sind.'},
@@ -1013,7 +1078,7 @@ const KNOWLEDGE = [
 ];
 
 /* ============ STATE ============ */
-const LS_SET='preg_settings_v2', LS_CHK='preg_checks_v1', LS_JOU='preg_journal_v1';
+const LS_SET='preg_settings_v2', LS_CHK='preg_checks_v1', LS_JOU='preg_journal_v1', LS_ROUT='preg_routine_v1', LS_ROWN='preg_routine_own_v1';
 
 /* Referenzlängen (Scheitel-Steiß bis SSW 20, danach Scheitel-Ferse) */
 const REF_LEN = {4:0.2,5:0.3,6:0.7,7:1.15,8:1.6,9:2.3,10:3.1,11:4.1,12:5.4,13:7.4,14:8.7,15:10.1,16:11.6,17:13,18:14.2,19:15.3,20:16.4,21:26.7,22:27.8,23:28.9,24:30,25:34.6,26:35.6,27:36.6,28:37.6,29:38.6,30:39.9,31:41.1,32:42.4,33:43.7,34:45,35:46.2,36:47.4,37:48.6,38:49.8,39:50.7,40:51.2};
@@ -1033,6 +1098,7 @@ let renderedSheet = null;
 let scrollToCard = null;
 let activeTab = 'heute';
 let tabScroll = {};
+let routineAdding = false;
 
 function gestation(){
   const due = new Date(settings.dueDate+'T00:00:00');
@@ -1175,6 +1241,46 @@ function tabBar(){
   ).join('')}</div></nav>`;
 }
 
+function routineCard(g){
+  const items = routineToday(g.week);
+  if(!items.length) return '';
+  const done = routineChecked(todayISO());
+  const n = items.filter(i=>done[i.id]).length;
+  const all = n===items.length;
+  const rows = items.map(i=>{
+    const on = !!done[i.id];
+    return `<div class="rrow ${on?'on':''}">
+      <div class="rrow-main" onclick="toggleRoutine('${i.id}')">
+        <div class="chk-box ${on?'on':''}"></div>
+        <div class="rrow-body">
+          <div class="rrow-label">${esc(i.label)}</div>
+          <div class="rrow-hint sans">${esc(i.hint)}</div>
+        </div>
+      </div>
+      ${i.own?`<button class="rrow-del" onclick="removeRoutineItem('${i.id}')" aria-label="Entfernen">×</button>`:''}
+    </div>`;
+  }).join('');
+  return `<div class="rhead">
+      <span class="lgroup-label" style="margin:0">Tagesroutine</span>
+      <span class="rcount sans ${all?'done':''}">${all?'Alles erledigt':n+' von '+items.length}</span>
+    </div>
+    <div class="rcard ${all?'complete':''}">
+      ${rows}
+      ${routineAdding
+        ? `<div class="rrow radd">
+             <input id="newRoutine" class="radd-input" placeholder="z. B. Magnesium" maxlength="60"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();addRoutineItem()}">
+             <button class="radd-ok" onclick="addRoutineItem()">Hinzufügen</button>
+           </div>`
+        : `<button class="rrow radd-btn sans" onclick="startRoutineAdd()">${ICONS.plus} Eigene Aufgabe</button>`}
+    </div>`;
+}
+function startRoutineAdd(){
+  routineAdding = true; render();
+  const box = document.getElementById('newRoutine');
+  if(box && box.focus) box.focus();
+}
+
 function screenHeute(g,wk){
   const pct = Math.min(100, Math.round(g.week/40*100));
   const etFmt = g.due.toLocaleDateString('de-DE',{day:'2-digit',month:'long',year:'numeric'});
@@ -1228,6 +1334,8 @@ function screenHeute(g,wk){
       </div>
     </div>`:''}
   </div>
+
+  ${routineCard(g)}
 
   ${focus.length?`<div class="lgroup-label">Jetzt dran in SSW ${g.week}</div>
   <div class="focus">${focus.map(f=>`
@@ -1672,7 +1780,7 @@ function toggleSettings(){ settingsOpen=!settingsOpen; render(); }
 function updateSetting(k,v){ settings[k]=v; lsSet(LS_SET,settings); render(); }
 function toggleCheck(id){ checks[id]=!checks[id]; lsSet(LS_CHK,checks); render(); }
 /* ---- Sicherung ---- */
-const LS_KEYS=[LS_SET,LS_CHK,LS_JOU];
+const LS_KEYS=[LS_SET,LS_CHK,LS_JOU,LS_ROUT,LS_ROWN];
 function exportData(){
   try{
     const data={};
