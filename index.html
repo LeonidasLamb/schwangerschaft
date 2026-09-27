@@ -50,8 +50,8 @@
 }
 html,body{background:var(--c0)}
 html{-webkit-text-size-adjust:100%}
-body{font-family:Georgia,'Times New Roman',serif;color:var(--ink);display:flex;justify-content:center;padding:1.6rem 1rem calc(3rem + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent}
-@media(min-width:640px){body{padding:2.2rem 1rem 4rem}}
+body{font-family:Georgia,'Times New Roman',serif;color:var(--ink);display:flex;justify-content:center;padding:1.6rem 1rem calc(6.5rem + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent}
+@media(min-width:640px){body{padding:2.2rem 1rem calc(7rem + env(safe-area-inset-bottom))}}
 .disp{font-family:'Fraunces',Georgia,serif}
 .sans{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .wrap{width:100%;max-width:760px}
@@ -164,6 +164,58 @@ a{color:inherit}
 .dcard-body{flex:1;min-width:0}
 .dcard-text{font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:17px;line-height:1.5;color:var(--ink2);text-wrap:balance}
 .dcard-tag{font-family:-apple-system,sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);margin-top:.65rem}
+
+/* ---- Tab-Navigation ---- */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;
+  background:color-mix(in srgb, var(--c0) 82%, transparent);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom)}
+.tabbar-inner{display:flex;width:100%;max-width:560px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:.55rem .2rem .5rem;background:none;border:none;cursor:pointer;color:var(--ink4);
+  font-family:-apple-system,sans-serif;font-size:9.5px;letter-spacing:.06em;min-height:54px;
+  transition:color .18s ease}
+.tab svg{opacity:.75;transition:opacity .18s ease,transform .18s ease}
+.tab.on{color:var(--gold-text)}
+.tab.on svg{opacity:1;transform:translateY(-1px)}
+.tab-dot{position:absolute;margin-left:22px;margin-top:-12px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+
+/* ---- Screen-Kopf ---- */
+.screen-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.1rem}
+.screen-title{font-family:'Fraunces',Georgia,serif;font-size:26px;line-height:1.15;color:var(--ink);letter-spacing:-.01em}
+.screen-sub{font-family:-apple-system,sans-serif;font-size:11.5px;color:var(--ink4);margin-top:.25rem;letter-spacing:.02em}
+
+/* ---- Fokus dieser Woche ---- */
+.focus{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.3rem}
+.focus-card{display:flex;align-items:center;gap:.9rem;padding:.95rem 1rem;border-radius:16px;
+  background:var(--c1);border:1px solid var(--line);cursor:pointer;transition:border-color .15s ease,transform .15s ease}
+.focus-card:hover{border-color:var(--gold-l)}
+.focus-card:active{transform:scale(.99)}
+.focus-card.urgent{background:linear-gradient(135deg,var(--c1),var(--c2));border-color:var(--line2)}
+.focus-art{width:34px;height:34px;flex-shrink:0;color:var(--gold-d)}
+.focus-body{flex:1;min-width:0}
+.focus-title{font-family:-apple-system,sans-serif;font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.focus-text{font-family:-apple-system,sans-serif;font-size:11.5px;color:var(--ink4);line-height:1.45;margin-top:2px}
+.focus-chev{color:var(--ink4);flex-shrink:0;font-size:15px}
+
+/* ---- Listenzeilen (Wissen) ---- */
+.lgroup{margin-bottom:1.5rem}
+.lgroup-label{font-family:-apple-system,sans-serif;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink4);margin:0 0 .5rem .2rem}
+.lrows{background:var(--c1);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.lrow{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;cursor:pointer;
+  border-top:1px solid var(--line);transition:background .15s ease;min-height:62px}
+.lrow:first-child{border-top:none}
+.lrow:hover{background:var(--c2)}
+.lrow:active{background:var(--c2)}
+.lrow-art{width:32px;height:32px;flex-shrink:0;color:var(--gold-d)}
+.lrow-body{flex:1;min-width:0}
+.lrow-title{font-family:-apple-system,sans-serif;font-size:14px;font-weight:600;color:var(--ink);line-height:1.3}
+.lrow-sub{font-family:-apple-system,sans-serif;font-size:11px;color:var(--ink4);margin-top:1px;line-height:1.4}
+.lrow-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.lrow-badge{font-family:-apple-system,sans-serif;font-size:9px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;background:var(--warn-bg);color:var(--warn-text);padding:.2rem .45rem;border-radius:7px}
+.lrow-chev{color:var(--line2);font-size:16px}
 
 /* ---- Bento grid ---- */
 .bento{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem}
@@ -294,7 +346,7 @@ a{color:inherit}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 /* Versionsstempel – bei jeder Veröffentlichung aktualisiert */
-const APP_VERSION = '24.09.2026';
+const APP_VERSION = '27.09.2026';
 
 /* ============ ILLUSTRATIONS ============ */
 const ART = {
@@ -416,6 +468,11 @@ const ICONS = {
   calSmall:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>`,
   play:`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg>`,
   plus:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+  chev:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>`,
+  tHeute:`<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>`,
+  tVerlauf:`<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.5 14c2 0 2-4 4-4s2 4 4 4 2-4 4-4 2 4 4 4 2-4 3-4"/><circle cx="12" cy="4.5" r="1.6" fill="currentColor" stroke="none"/></svg>`,
+  tTagebuch:`<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-2.1-1.8-4.7-2.3-7.8-1.8v11.2c3.1-.5 5.7 0 7.8 1.8 2.1-1.8 4.7-2.3 7.8-1.8V5.2c-3.1-.5-5.7 0-7.8 1.8Z"/><path d="M12 7v11.2"/></svg>`,
+  tWissen:`<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/><circle cx="8.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="10" cy="17.5" r="1.5" fill="currentColor" stroke="none"/></svg>`,
 };
 
 /* ============ SOURCES ============ */
@@ -903,6 +960,58 @@ const CHECKLIST = [
 
 const SOURCES_ALL = Object.entries(SRC);
 
+/* Was in der jeweiligen Woche wirklich ansteht – höchste Priorität zuerst */
+const WEEK_FOCUS = [
+  {from:4,to:12,pri:1,art:'leaf',sheet:'supp',title:'Folsäure und Jod',text:'Die beiden Mittel, die jetzt für alle empfohlen sind.'},
+  {from:4,to:11,pri:2,art:'fish',sheet:'foodavoid',title:'Was ab jetzt wegfällt',text:'Roh, alkoholisch, zu viel Koffein – einmal in Ruhe durchgehen.'},
+  {from:4,to:12,pri:3,art:'calendar',sheet:'checklist',title:'Mutterpass & erste Vorsorge',text:'Wird beim ersten Termin ausgestellt.'},
+  {from:8,to:14,pri:2,art:'passport',sheet:'mutterpass',title:'Mutterpass verstehen',text:'Damit die Kürzel nach dem Termin etwas sagen.'},
+  {from:12,to:22,pri:1,art:'hands',sheet:'checklist',title:'Hebamme suchen',text:'Die Nachfrage übersteigt oft das Angebot – früh lohnt sich.'},
+  {from:14,to:27,pri:3,art:'plane',sheet:'travel',title:'Beste Reisezeit',text:'Zweites Trimester: Übelkeit vorbei, Bauch noch handlich.'},
+  {from:16,to:24,pri:2,art:'blossom',sheet:'sport',title:'Beckenboden aufbauen',text:'Jetzt beginnen zahlt sich bei der Geburt aus.'},
+  {from:20,to:27,pri:1,art:'stroller',sheet:'shopping',title:'Große Anschaffungen bestellen',text:'Kinderwagen haben 3 bis 10 Wochen Lieferzeit.'},
+  {from:19,to:24,pri:2,art:'camera',sheet:'ultrasound',title:'Nach 3D-Bildern fragen',text:'Beim zweiten Screening ist das Zeitfenster günstig.'},
+  {from:24,to:31,pri:1,art:'syringe',sheet:'vaccines',title:'Keuchhusten-Impfung',text:'Ab SSW 28 empfohlen – senkt das Risiko beim Baby um rund 90 %.',urgent:true},
+  {from:26,to:32,pri:2,art:'breath',sheet:'checklist',title:'Geburtsvorbereitungskurs',text:'Startet meist ab SSW 28 bis 30.'},
+  {from:28,to:40,pri:1,art:'footprint',sheet:'warnings',title:'Auf Kindsbewegungen achten',text:'Deutlich weniger Bewegung gehört sofort abgeklärt.',urgent:true},
+  {from:30,to:36,pri:2,art:'bag',sheet:'shopping',title:'Kliniktasche packen',text:'Bis SSW 36 sollte sie gepackt bereitstehen.'},
+  {from:32,to:40,pri:3,art:'crib',sheet:'babysleep',title:'Sicherer Babyschlaf',text:'Jetzt entscheiden, bevor das Baby da ist.'},
+  {from:34,to:40,pri:2,art:'stamp',sheet:'afterbirth',title:'Fristen nach der Geburt',text:'Elterngeld nur 3 Monate rückwirkend – vorher lesen.'},
+];
+function weekFocus(w){
+  return WEEK_FOCUS.filter(f=>w>=f.from && w<=f.to).sort((a,b)=>a.pri-b.pri).slice(0,3);
+}
+
+/* Struktur des Wissens-Bereichs */
+const KNOWLEDGE = [
+  {label:'Gesundheit', rows:[
+    {id:'warnings',art:'phone',title:'Warnzeichen',sub:'Wann sofort anrufen',badge:'Wichtig'},
+    {id:'complaints',art:'flame',title:'Beschwerden',sub:'Was wirklich hilft'},
+    {id:'supp',art:'leaf',title:'Nahrungsergänzung',sub:'3 empfohlen, 5 individuell'},
+    {id:'foodavoid',art:'fish',title:'Lebensmittel',sub:'Was meiden, was geht'},
+    {id:'actavoid',art:'thermo',title:'Alltag & Aktivitäten',sub:'Sauna, Sport, Katze, Röntgen'},
+    {id:'meds',art:'tablet',title:'Medikamente',sub:'Kopfweh und Übelkeit'},
+    {id:'vaccines',art:'syringe',title:'Impfungen',sub:'Keuchhusten ab SSW 28',badge:'Termin'},
+    {id:'sport',art:'blossom',title:'Sport & Beckenboden',sub:'Mit Video-Anleitungen'},
+  ]},
+  {label:'Organisation', rows:[
+    {id:'shopping',art:'stroller',title:'Anschaffungen',sub:'Wann was kaufen, eure Liste'},
+    {id:'checklist',art:'calendar',title:'Checkliste',sub:'Vorsorge, Dokumente, Kurse'},
+    {id:'travel',art:'plane',title:'Reisen',sub:'Fliegen, Auto, Versicherung'},
+    {id:'pkv',art:'babyshield',title:'Privat versichert',sub:'Zwei Fristen beachten',badge:'Frist'},
+    {id:'mutterpass',art:'passport',title:'Mutterpass',sub:'Alle Kürzel erklärt'},
+    {id:'ultrasound',art:'camera',title:'Ultraschallbilder',sub:'3D und die Rechtslage'},
+  ]},
+  {label:'Fürs erste Jahr', rows:[
+    {id:'babysleep',art:'crib',title:'Sicherer Babyschlaf',sub:'Größter Einzeleffekt'},
+    {id:'care',art:'kids',title:'Kita oder Tagesmutter',sub:'Was die Studien sagen'},
+    {id:'afterbirth',art:'stamp',title:'Nach der Geburt',sub:'Fristen und Anträge'},
+  ]},
+  {label:'Grundlage', rows:[
+    {id:'sources',art:'receipt',title:'Alle Quellen',sub:SOURCES_ALL.length+' Nachweise zum Nachlesen'},
+  ]},
+];
+
 /* ============ STATE ============ */
 const LS_SET='preg_settings_v2', LS_CHK='preg_checks_v1', LS_JOU='preg_journal_v1';
 
@@ -922,6 +1031,8 @@ let triFilter = 0;
 let openCards = {};
 let renderedSheet = null;
 let scrollToCard = null;
+let activeTab = 'heute';
+let tabScroll = {};
 
 function gestation(){
   const due = new Date(settings.dueDate+'T00:00:00');
@@ -1056,36 +1167,37 @@ function todaysCompliment(){
 }
 
 /* ============ RENDER ============ */
-function render(){
-  const prevSb = document.querySelector && document.querySelector('.sheet-body');
-  const sameSheet = activeSheet && activeSheet === renderedSheet;
-  const keepScroll = (prevSb && sameSheet) ? prevSb.scrollTop : 0;
-  const g = gestation();
-  const wkNum = Math.max(4, Math.min(40, g.week));
-  const wk = WEEKS.find(x=>x.w===wkNum) || WEEKS[0];
+function tabBar(){
+  const tabs=[['heute','Heute',ICONS.tHeute],['verlauf','Verlauf',ICONS.tVerlauf],
+              ['tagebuch','Tagebuch',ICONS.tTagebuch],['wissen','Wissen',ICONS.tWissen]];
+  return `<nav class="tabbar"><div class="tabbar-inner">${tabs.map(([id,label,icon])=>
+    `<button class="tab ${activeTab===id?'on':''}" onclick="setTab('${id}')" aria-label="${label}">${icon}<span>${label}</span></button>`
+  ).join('')}</div></nav>`;
+}
+
+function screenHeute(g,wk){
   const pct = Math.min(100, Math.round(g.week/40*100));
   const etFmt = g.due.toLocaleDateString('de-DE',{day:'2-digit',month:'long',year:'numeric'});
   const compliment = todaysCompliment();
-
-  let apptHtml = '';
+  const focus = weekFocus(g.week);
+  let apptHtml='';
   if(settings.nextAppt){
-    const ad = new Date(settings.nextAppt+'T00:00:00');
-    const today = new Date(); today.setHours(0,0,0,0);
-    const diff = Math.round((ad-today)/86400000);
-    const when = diff===0?'heute':diff===1?'morgen':diff>1?`in ${diff} Tagen`:'vorbei';
-    apptHtml = `<div class="appt-pill">${ICONS.calSmall} Nächster Termin: ${ad.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} · ${when}</div>`;
+    const ad=new Date(settings.nextAppt+'T00:00:00'), t=new Date(); t.setHours(0,0,0,0);
+    const diff=Math.round((ad-t)/86400000);
+    const when=diff===0?'heute':diff===1?'morgen':diff>1?`in ${diff} Tagen`:'vorbei';
+    apptHtml=`<div class="appt-pill">${ICONS.calSmall} Nächster Termin: ${ad.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} · ${when}</div>`;
   }
-
-  const doneCount = CHECKLIST.filter(i=>checks[i.id]).length;
-
-  document.getElementById('app').innerHTML = `
-  <div class="eyebrow"><span>Unsere Reise</span><div class="ornament"></div></div>
+  return `
+  <div class="screen-head">
+    <div>
+      <div class="screen-title">${settings.name?'Hallo '+esc(settings.name):'Unsere Reise'}</div>
+      <div class="screen-sub">${new Date().toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long'})}</div>
+    </div>
+    <button class="icon-btn" onclick="toggleSettings()" aria-label="Einstellungen">${ICONS.gear}</button>
+  </div>
+  ${renderSettings()}
 
   <div class="hero">
-    <div class="hero-top">
-      <div>${settings.name?`<div class="hero-name">Für ${esc(settings.name)} &amp; unser Baby</div>`:''}</div>
-      <button class="icon-btn" onclick="toggleSettings()" title="Einstellungen" aria-label="Einstellungen">${ICONS.gear}</button>
-    </div>
     <div class="hero-main">
       <div class="hero-figpic">${art(wk.icon)}</div>
       <div>
@@ -1097,10 +1209,7 @@ function render(){
     <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
     <div class="progress-label sans"><span>SSW ${g.week} von 40 · ET ${etFmt}</span><span>${pct}%</span></div>
     ${apptHtml}
-    ${renderSettings()}
   </div>
-
-  ${journalQuick()}
 
   <div class="daily">
     <div class="dcard dcard-quote">
@@ -1120,54 +1229,80 @@ function render(){
     </div>`:''}
   </div>
 
-  <div class="bento">
-    <div class="tile span2" onclick="openSheet('weeks')">
-      <div class="tile-big-row">
-        <div class="tile-big-pic">${art(wk.icon)}</div>
-        <div>
-          <div class="tile-title">Wochenverlauf</div>
-          <div class="tile-stat">SSW ${g.week} · so groß wie ${esc(wk.size)}</div>
-        </div>
+  ${focus.length?`<div class="lgroup-label">Jetzt dran in SSW ${g.week}</div>
+  <div class="focus">${focus.map(f=>`
+    <div class="focus-card ${f.urgent?'urgent':''}" onclick="openSheet('${f.sheet}')">
+      <div class="focus-art">${art(f.art)}</div>
+      <div class="focus-body">
+        <div class="focus-title">${esc(f.title)}</div>
+        <div class="focus-text">${esc(f.text)}</div>
       </div>
-    </div>
-  </div>
+      <div class="focus-chev">${ICONS.chev}</div>
+    </div>`).join('')}</div>`:''}
 
-  <div class="bento-label sans">Gesundheit</div>
-  <div class="bento">
-    ${tile('warnings','Warnzeichen','Wann sofort anrufen','phone',true)}
-    ${tile('complaints','Beschwerden','Was wirklich hilft','flame')}
-    ${tile('supp','Nahrungsergänzung','3 empfohlen · 5 individuell','leaf')}
-    ${tile('foodavoid','Lebensmittel','8 Punkte im Blick','fish')}
-    ${tile('actavoid','Alltag & Aktivitäten','7 Punkte im Blick','thermo')}
-    ${tile('meds','Medikamente','Kopfweh & Übelkeit','tablet')}
-    ${tile('vaccines','Impfungen','Keuchhusten ab SSW 28','syringe',true)}
-    ${tile('sport','Sport & Beckenboden','Mit Video-Anleitungen','blossom')}
-    ${tile('mutterpass','Mutterpass','Alle Kürzel erklärt','passport')}
-    ${tile('ultrasound','Ultraschallbilder','3D: die Rechtslage','camera')}
-  </div>
+  ${journalQuick()}`;
+}
 
-  <div class="bento-label sans">Alltag & Organisation</div>
-  <div class="bento">
-    ${tile('shopping','Anschaffungen','Wann was kaufen','stroller')}
-    ${tile('travel','Reisen','Fliegen, Auto, Versicherung','plane')}
-    ${tile('checklist','Checkliste',doneCount+' von '+CHECKLIST.length+' erledigt','calendar')}
-    ${tile('pkv','Privat versichert','2 Fristen beachten','babyshield',true)}
-  </div>
+function screenVerlauf(g){
+  return `<div class="screen-head"><div>
+      <div class="screen-title">Verlauf</div>
+      <div class="screen-sub">Entwicklung Woche für Woche</div>
+    </div></div>
+    ${renderWeeks(g)}`;
+}
 
-  <div class="bento-label sans">Fürs erste Jahr</div>
-  <div class="bento">
-    ${tile('babysleep','Sicherer Babyschlaf','Größter Einzeleffekt','crib')}
-    ${tile('care','Kita oder Tagesmutter','Was die Studien sagen','kids')}
-    ${tile('afterbirth','Nach der Geburt','Fristen & Anträge','stamp')}
-    ${tile('sources','Alle Quellen',SOURCES_ALL.length+' Nachweise','receipt')}
-  </div>
+function screenTagebuch(g){
+  const days=journalDays().length;
+  return `<div class="screen-head"><div>
+      <div class="screen-title">Tagebuch</div>
+      <div class="screen-sub">${days?days+' Eintr'+(days===1?'ag':'äge'):'Noch keine Einträge'}</div>
+    </div></div>
+    ${renderJournal(g)}`;
+}
 
-  <div class="footer">
-    Liebevoll zusammengestellt · alle Angaben recherchiert und mit Quellen belegt,<br>
-    ersetzen aber keine individuelle Beratung durch Frauenärztin oder Hebamme.
-    <div class="ver">Stand ${APP_VERSION} · <button class="ver-btn" onclick="location.reload()">Auf neueste Version prüfen</button></div>
-  </div>
-  ${renderSheet(g)}`;
+function screenWissen(){
+  const done=CHECKLIST.filter(i=>checks[i.id]).length;
+  const groups=KNOWLEDGE.map(gr=>`
+    <div class="lgroup">
+      <div class="lgroup-label">${esc(gr.label)}</div>
+      <div class="lrows">${gr.rows.map(r=>{
+        const sub = r.id==='checklist' ? done+' von '+CHECKLIST.length+' erledigt' : r.sub;
+        return `<div class="lrow" onclick="openSheet('${r.id}')">
+          <div class="lrow-art">${art(r.art)}</div>
+          <div class="lrow-body">
+            <div class="lrow-title">${esc(r.title)}</div>
+            <div class="lrow-sub">${esc(sub)}</div>
+          </div>
+          <div class="lrow-right">${r.badge?`<span class="lrow-badge">${esc(r.badge)}</span>`:''}<span class="lrow-chev">${ICONS.chev}</span></div>
+        </div>`;}).join('')}</div>
+    </div>`).join('');
+  return `<div class="screen-head"><div>
+      <div class="screen-title">Wissen</div>
+      <div class="screen-sub">Alles belegt, alles nachlesbar</div>
+    </div></div>
+    ${groups}
+    <div class="footer">
+      Alle Angaben recherchiert und mit Quellen belegt, ersetzen aber keine<br>
+      individuelle Beratung durch Frauenärztin oder Hebamme.
+      <div class="ver">Stand ${APP_VERSION} · <button class="ver-btn" onclick="location.reload()">Auf neueste Version prüfen</button></div>
+    </div>`;
+}
+
+function render(){
+  const prevSb = document.querySelector && document.querySelector('.sheet-body');
+  const sameSheet = activeSheet && activeSheet === renderedSheet;
+  const keepScroll = (prevSb && sameSheet) ? prevSb.scrollTop : 0;
+  const g = gestation();
+  const wkNum = Math.max(4, Math.min(40, g.week));
+  const wk = WEEKS.find(x=>x.w===wkNum) || WEEKS[0];
+
+  let body;
+  if(activeTab==='verlauf') body = screenVerlauf(g);
+  else if(activeTab==='tagebuch') body = screenTagebuch(g);
+  else if(activeTab==='wissen') body = screenWissen();
+  else body = screenHeute(g,wk);
+
+  document.getElementById('app').innerHTML = body + tabBar() + renderSheet(g);
 
   renderedSheet = activeSheet;
   const nsb = document.querySelector && document.querySelector('.sheet-body');
@@ -1184,6 +1319,14 @@ function render(){
     }
   }
   scrollToCard = null;
+}
+
+function setTab(id){
+  if(activeTab===id){ window.scrollTo({top:0,behavior:'smooth'}); return; }
+  tabScroll[activeTab] = window.scrollY||0;
+  activeTab = id; settingsOpen = false;
+  render();
+  window.scrollTo(0, tabScroll[id]||0);
 }
 
 function tile(id,title,stat,artKey,urgent){
@@ -1286,7 +1429,7 @@ function journalQuick(){
         <div class="jq-title">Heute · ${new Date(iso+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'long'})}</div>
         <div class="jq-sub sans">SSW ${g.w}+${g.d}</div>
       </div>
-      <button class="jq-link sans" onclick="openSheet('journal')">Tagebuch →</button>
+      <button class="jq-link sans" onclick="setTab('tagebuch')">Alle Tage →</button>
     </div>
     <textarea class="jq-note" placeholder="Wie geht es dir heute? Was möchtest du festhalten?" onchange="setJ('${iso}','note',this.value)">${esc(e.note||'')}</textarea>
     <div class="jq-meas">
@@ -1352,8 +1495,6 @@ function renderJournal(){
 
 /* ---- Sheets ---- */
 const SHEETS = {
-  journal:{title:'Tagebuch',art:'bookopen',body:renderJournal},
-  weeks:{title:'Dein Wochenverlauf',art:'melon',body:renderWeeks},
   warnings:{title:'Wann sofort anrufen',art:'phone',body:()=>renderFlat('warnings',WARNINGS)},
   complaints:{title:'Beschwerden & was hilft',art:'flame',body:()=>renderFlat('complaints',COMPLAINTS)},
   supp:{title:'Nahrungsergänzung',art:'leaf',body:()=>renderGrouped('supp',SUPPLEMENTS)},
