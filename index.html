@@ -128,6 +128,9 @@ a{color:inherit}
 .jphoto-add{display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;font-size:11.5px;font-weight:600;color:var(--gold-text);background:var(--c1);border:1px dashed var(--line2);border-radius:12px;padding:.6rem .9rem;cursor:pointer;min-height:42px}
 .jphoto-add:hover{border-color:var(--gold)}
 .jempty{font-size:13.5px;color:var(--ink4);line-height:1.6;padding:.8rem 0}
+.bfig{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.bfig img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.bfig-fallback{width:100%;height:100%}
 .stagep{display:flex;gap:1.1rem;align-items:center;background:linear-gradient(135deg,var(--c1),var(--c2));border:1px solid var(--line);border-radius:18px;padding:1.1rem 1.2rem}
 .stagep-fig{width:100px;height:110px;flex-shrink:0}
 .stagep-txt{flex:1;min-width:0}
@@ -375,7 +378,7 @@ a{color:inherit}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 /* Versionsstempel – bei jeder Veröffentlichung aktualisiert */
-const APP_VERSION = '06.10.2026';
+const APP_VERSION = '06.10.2026b';
 
 /* ============ ILLUSTRATIONS ============ */
 const ART = {
@@ -1519,6 +1522,24 @@ function fetusParams(w){
 }
 function fetStage(w){ return FET_STAGES.find(s=>w<=s.to) || FET_STAGES[FET_STAGES.length-1]; }
 
+/* Echte Renderings pro Stadium; fuer Wochen dazwischen wird das naechstliegende genommen.
+   Faellt ein Bild aus, erscheint automatisch die gezeichnete Silhouette. */
+const BABY_IMG = [6,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40];
+function babyImgWeek(w){
+  w = Math.max(4, Math.min(40, w));
+  return BABY_IMG.reduce((best,x)=> Math.abs(x-w) < Math.abs(best-w) ? x : best, BABY_IMG[0]);
+}
+function babyFigure(week,uid,cls){
+  const w = Math.max(4, Math.min(40, week));
+  const f = String(babyImgWeek(w)).padStart(2,'0');
+  const s = fetStage(w);
+  return `<div class="bfig ${cls||''}">
+    <img src="img/w${f}.webp" alt="Darstellung des Kindes in SSW ${w}" loading="lazy"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="bfig-fallback" style="display:none">${fetusSVG(w,uid)}</div>
+  </div>`;
+}
+
 function fetusSVG(week,uid){
   const s = fetStage(week), u = uid||'x';
   const P = fetusParams(week);           // stufenlos je Woche interpoliert
@@ -1527,7 +1548,7 @@ function fetusSVG(week,uid){
   const bx = 20 + P.bs*26, by = 22 + P.bs*26;
   const cx = 66, cy = hy + hr*0.72 + by*0.52;   // Rumpf versetzt -> Komma-Form
   const L = P.limb;
-  return `<svg viewBox="0 0 150 165" width="100%" height="100%" role="img" aria-label="Stilisierte Darstellung: ${esc(s.label)}">
+  return `<svg viewBox="0 0 150 165" width="100%" height="100%" role="img" aria-label="Darstellung: ${esc(s.label)}">
     <defs>
       <radialGradient id="bod${u}" cx="34%" cy="22%" r="88%">
         <stop offset="0%"   stop-color="var(--gold-l)"/>
@@ -1603,7 +1624,7 @@ function stagePanel(g){
   const w = Math.max(4,Math.min(40,g.week));
   const s = fetStage(w), wk = WEEKS.find(x=>x.w===w) || WEEKS[0];
   return `<div class="stagep">
-    <div class="stagep-fig">${fetusSVG(w,'main')}</div>
+    <div class="stagep-fig">${babyFigure(w,'main')}</div>
     <div class="stagep-txt">
       <div class="stagep-w disp">SSW ${g.week}+${g.day}</div>
       <div class="stagep-label">${esc(s.label)}</div>
@@ -1612,7 +1633,7 @@ function stagePanel(g){
       ${sizeScale(w)}
     </div>
   </div>
-  <div class="chart-note">Stilisierte Darstellung nach anatomischen Proportionen – kein Ultraschallbild und kein Abbild eures Babys.</div>`;
+  <div class="chart-note">Beispieldarstellung des jeweiligen Entwicklungsstands – kein Ultraschallbild und kein Abbild eures Babys.</div>`;
 }
 
 function journalQuick(){
@@ -1674,10 +1695,10 @@ function renderJournal(){
     ? days.map(d=>journalEntryCard(d, !!openCards['jour_'+d])).join('')
     : '<div class="jempty">Noch keine Einträge. Schreib oben etwas zu heute – ab morgen kannst du hier zurückblättern.</div>';
   return `<div class="jhero">
-      <div class="jhero-art">${fetusSVG(Math.max(4,Math.min(40,g.w)),'jour')}</div>
+      <div class="jhero-art">${babyFigure(g.w,'jour')}</div>
       <div>
         <div class="jhero-w disp">SSW ${g.w}+${g.d}</div>
-        <div class="jhero-t">${esc(fetStage(g.w).label)} – stilisierte Darstellung, kein Ultraschallbild.</div>
+        <div class="jhero-t">${esc(fetStage(g.w).label)} – Beispieldarstellung, kein Ultraschallbild.</div>
       </div>
     </div>
     ${journalMsg?`<div class="fb-toast" style="background:var(--warn-bg);color:var(--warn-text)">${esc(journalMsg)}</div>`:''}
@@ -1807,7 +1828,7 @@ function renderWeeks(g){
   const strip = FET_STAGES.map((st,i)=>{
     const shown = st.to<99 ? Math.round((parseInt(st.from,10)+st.to)/2) : 39;
     return `<div class="strip-item ${st===curStage?'now':''}" title="${esc(st.label)}">
-      <div class="strip-fig">${fetusSVG(shown,'s'+i)}</div>
+      <div class="strip-fig">${babyFigure(shown,'s'+i)}</div>
       <div class="strip-w sans">SSW ${esc(st.from)}${st.to<99?'–'+st.to:'+'}</div>
     </div>`;}).join('');
   return `${stagePanel(g)}
