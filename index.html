@@ -375,7 +375,7 @@ a{color:inherit}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 /* Versionsstempel – bei jeder Veröffentlichung aktualisiert */
-const APP_VERSION = '05.10.2026';
+const APP_VERSION = '06.10.2026';
 
 /* ============ ILLUSTRATIONS ============ */
 const ART = {
@@ -1481,24 +1481,52 @@ function renderSettings(){
    Die Kopf-Körper-Proportion ist das, was sich real am stärksten ändert:
    früh macht der Kopf fast die Hälfte aus, zum Termin etwa ein Viertel. */
 const FET_STAGES = [
-  {to:6,  hr:15, headShare:0.52, bx:11, by:15, limb:0,  tail:true, from:'4', label:'Embryo, C-förmig gekrümmt', detail:'Kopf- und Schwanzende sind kaum zu unterscheiden. Das Herz liegt als Wölbung vorn.'},
-  {to:9,  hr:16, headShare:0.48, bx:15, by:17, limb:6,  tail:true, from:'7',   label:'Arm- und Beinknospen', detail:'Die Gliedmaßen sprießen als kleine Paddel, der Schwanzfortsatz bildet sich zurück.'},
-  {to:13, hr:17, headShare:0.44, bx:18, by:19, limb:11, from:'10', label:'Menschliche Form', detail:'Finger und Zehen sind getrennt. Der Kopf macht noch rund die Hälfte der Länge aus.'},
-  {to:20, hr:16, headShare:0.38, bx:21, by:21, limb:15, from:'14', label:'Fötus, schlank', detail:'Arme und Beine werden länger, die Proportionen verschieben sich Richtung Körper.'},
-  {to:30, hr:15, headShare:0.33, bx:24, by:23, limb:17, from:'21', label:'Rundlich, Hände am Gesicht', detail:'Fettpolster entstehen, das Baby greift und tastet, oft mit den Händen vorm Gesicht.'},
-  {to:99, hr:14, headShare:0.3, bx:27, by:25, limb:18, from:'31', label:'Reif, eng zusammengerollt', detail:'Kaum noch Platz: Arme und Beine sind fest angezogen, der Kopf liegt meist unten.'},
+  {to:6,  from:'4',  label:'Embryo, C-förmig gekrümmt', detail:'Kopf- und Schwanzende sind kaum zu unterscheiden. Das Herz schlägt bereits.'},
+  {to:8,  from:'7',  label:'Arm- und Beinknospen',      detail:'Die Gliedmaßen sprießen als kleine Paddel, die Augenlider legen sich an.'},
+  {to:10, from:'9',  label:'Ende der Embryonalzeit',    detail:'Finger und Zehen trennen sich. Ab jetzt spricht man vom Fötus.'},
+  {to:13, from:'11', label:'Menschliche Form',          detail:'Der Kopf macht noch rund die Hälfte der Länge aus, erste Reflexe entstehen.'},
+  {to:17, from:'14', label:'Fötus, schlank',            detail:'Arme und Beine werden länger, das Gehör beginnt sich zu entwickeln.'},
+  {to:21, from:'18', label:'Erste spürbare Bewegungen', detail:'Die Proportionen verschieben sich Richtung Körper, viele spüren jetzt die ersten Tritte.'},
+  {to:26, from:'22', label:'Die Augen öffnen sich',     detail:'Ein Schlaf-Wach-Rhythmus entsteht, das Baby reagiert auf Stimmen.'},
+  {to:31, from:'27', label:'Rundlich, Hände am Gesicht',detail:'Fettpolster entstehen, das Baby greift und tastet.'},
+  {to:36, from:'32', label:'Eng im Bauch',              detail:'Kaum noch Platz. Die meisten drehen sich jetzt mit dem Kopf nach unten.'},
+  {to:99, from:'37', label:'Reif und bereit',           detail:'Arme und Beine fest angezogen, die Lunge ist ausgereift.'},
 ];
+
+/* Zeichenparameter als Stuetzstellen - dazwischen wird interpoliert,
+   damit jede einzelne Woche ihre eigene Proportion bekommt. */
+const FET_KEYS = [
+  {w:4,  hs:0.56, bs:0.34, limb:0,    tail:1},
+  {w:7,  hs:0.52, bs:0.46, limb:5,    tail:1},
+  {w:10, hs:0.48, bs:0.58, limb:9,    tail:0.45},
+  {w:13, hs:0.45, bs:0.70, limb:12,   tail:0},
+  {w:17, hs:0.41, bs:0.80, limb:15,   tail:0},
+  {w:21, hs:0.38, bs:0.88, limb:17,   tail:0},
+  {w:26, hs:0.35, bs:0.95, limb:18,   tail:0},
+  {w:31, hs:0.33, bs:1.00, limb:19,   tail:0},
+  {w:36, hs:0.31, bs:1.05, limb:19.5, tail:0},
+  {w:40, hs:0.30, bs:1.08, limb:20,   tail:0},
+];
+function fetusParams(w){
+  w = Math.max(4, Math.min(40, w));
+  let a = FET_KEYS[0], b = FET_KEYS[FET_KEYS.length-1];
+  for(let i=0;i<FET_KEYS.length-1;i++){
+    if(w>=FET_KEYS[i].w && w<=FET_KEYS[i+1].w){ a=FET_KEYS[i]; b=FET_KEYS[i+1]; break; }
+  }
+  const t = (b.w===a.w) ? 0 : (w-a.w)/(b.w-a.w);
+  const L = (x,y)=>x+(y-x)*t;
+  return {hs:L(a.hs,b.hs), bs:L(a.bs,b.bs), limb:L(a.limb,b.limb), tail:L(a.tail,b.tail)};
+}
 function fetStage(w){ return FET_STAGES.find(s=>w<=s.to) || FET_STAGES[FET_STAGES.length-1]; }
 
 function fetusSVG(week,uid){
   const s = fetStage(week), u = uid||'x';
-  // Kopfanteil sinkt mit der Entwicklung: fruehe Embryonen sind fast nur Kopf
-  const k = s.headShare;                 // 0.52 früh ... 0.30 spät
-  const hr = 30*k + 14;                  // Kopfradius
-  const hx = 86, hy = 40 + (1-k)*6;      // Kopf: oben rechts
-  const bx = 26 + (1-k)*16, by = 30 + (1-k)*16;
-  const cx = 66, cy = hy + hr*0.72 + by*0.52;   // Rumpf leicht versetzt -> Komma-Form
-  const L = s.limb;
+  const P = fetusParams(week);           // stufenlos je Woche interpoliert
+  const hr = 30*P.hs + 14;               // Kopfradius
+  const hx = 86, hy = 40 + (1-P.hs)*6;   // Kopf: oben rechts
+  const bx = 20 + P.bs*26, by = 22 + P.bs*26;
+  const cx = 66, cy = hy + hr*0.72 + by*0.52;   // Rumpf versetzt -> Komma-Form
+  const L = P.limb;
   return `<svg viewBox="0 0 150 165" width="100%" height="100%" role="img" aria-label="Stilisierte Darstellung: ${esc(s.label)}">
     <defs>
       <radialGradient id="bod${u}" cx="34%" cy="22%" r="88%">
@@ -1525,8 +1553,8 @@ function fetusSVG(week,uid){
     <path d="M${(cx-bx*0.7).toFixed(0)} ${(cy+6).toFixed(0)} C${(cx-bx-16).toFixed(0)} ${(cy+18).toFixed(0)} ${(cx-bx-4).toFixed(0)} ${(cy+36).toFixed(0)} ${(cx-bx-22).toFixed(0)} ${(cy+44).toFixed(0)}"
           fill="none" stroke="var(--gold-d)" stroke-width="2.4" stroke-linecap="round" opacity=".38"/>
 
-    ${s.tail?`<path d="M${(cx-bx*0.45).toFixed(0)} ${(cy+by*0.62).toFixed(0)} Q${(cx-bx*1.15).toFixed(0)} ${(cy+by*1.3).toFixed(0)} ${(cx-bx*0.1).toFixed(0)} ${(cy+by*1.55).toFixed(0)}"
-          fill="none" stroke="url(#lmb${u})" stroke-width="${L?7:9}" stroke-linecap="round"/>`:''}
+    ${P.tail>0.05?`<path d="M${(cx-bx*0.45).toFixed(0)} ${(cy+by*0.62).toFixed(0)} Q${(cx-bx*1.15).toFixed(0)} ${(cy+by*1.3).toFixed(0)} ${(cx-bx*0.1).toFixed(0)} ${(cy+by*1.55).toFixed(0)}"
+          fill="none" stroke="url(#lmb${u})" stroke-width="${(L?7:9)*Math.max(.45,P.tail)}" stroke-linecap="round" opacity="${P.tail.toFixed(2)}"/>`:''}
 
     ${L?`<path d="M${(cx-2).toFixed(0)} ${(cy+by*0.5).toFixed(0)} Q${(cx+bx*0.9).toFixed(0)} ${(cy+by*1.05).toFixed(0)} ${(cx+bx*1.25).toFixed(0)} ${(cy+by*0.25).toFixed(0)}"
           fill="none" stroke="url(#lmb${u})" stroke-width="${(L*0.72).toFixed(1)}" stroke-linecap="round"/>`:''}
@@ -1776,10 +1804,12 @@ function renderWeeks(g){
   </div>`).join('');
   const tris = [['Alle',0],['1. Trimester',1],['2. Trimester',2],['3. Trimester',3]];
   const curStage = fetStage(now);
-  const strip = FET_STAGES.map((s,i)=>`<div class="strip-item ${s===curStage?'now':''}">
-      <div class="strip-fig">${fetusSVG([6,9,13,20,30,40][i],'s'+i)}</div>
-      <div class="strip-w sans">SSW ${esc(s.from)}${s.to<99?'–'+s.to:'+'}</div>
-    </div>`).join('');
+  const strip = FET_STAGES.map((st,i)=>{
+    const shown = st.to<99 ? Math.round((parseInt(st.from,10)+st.to)/2) : 39;
+    return `<div class="strip-item ${st===curStage?'now':''}" title="${esc(st.label)}">
+      <div class="strip-fig">${fetusSVG(shown,'s'+i)}</div>
+      <div class="strip-w sans">SSW ${esc(st.from)}${st.to<99?'–'+st.to:'+'}</div>
+    </div>`;}).join('');
   return `${stagePanel(g)}
     <div class="group-label">Die Stadien im Überblick</div>
     <div class="strip">${strip}</div>
